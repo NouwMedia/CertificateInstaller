@@ -170,6 +170,12 @@ namespace ACMESharp.Providers.IIS
 
                     var bindingInfo = $"{bindingAddr}:{bindingPort}:{bindingHost}";
                     var b = site.Bindings.Add(bindingInfo, certHash, certStore);
+
+                    // PATCH - Set SNI flag for new binding
+                    if (binding.BindingHostRequired.GetValueOrDefault() && GetIisVersion().Major >= 8)
+                        b.SetAttributeValue("sslFlags", 1);
+                    else
+                        b.SetAttributeValue("sslFlags", 3);
                 }
 
                 iis.CommitChanges();
